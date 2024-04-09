@@ -1,0 +1,6 @@
+@POC1_SQL_HostAddress = http://localhost:5242
+
+GET {{POC1_SQL_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
