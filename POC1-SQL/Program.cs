@@ -1,4 +1,6 @@
 
+using Microsoft.EntityFrameworkCore;
+
 namespace POC1_SQL
 {
     public class Program
@@ -14,6 +16,22 @@ namespace POC1_SQL
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            var connection = String.Empty;
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+                connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+            }
+            else
+            {
+                connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+            }
+
+            //builder.Services.AddDbContext<PersonDbContext>(options =>
+                //options.UseSqlServer(connection));
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -22,7 +40,41 @@ namespace POC1_SQL
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            /*
+            app.MapGet("/Person", (PersonDbContext context) =>
+            {
+                return context.Person.ToList();
+            })
+            .WithName("GetPersons")
+            .WithOpenApi();
 
+            app.MapPost("/Person", (Person person, PersonDbContext context) =>
+            {
+                context.Add(person);
+                context.SaveChanges();
+            })
+            .WithName("CreatePerson")
+            .WithOpenApi();
+
+
+
+            public class Person
+            {
+                public int Id { get; set; }
+                public string FirstName { get; set; }
+                public string LastName { get; set; }
+            }
+
+            public class PersonDbContext : DbContext
+            {
+                public PersonDbContext(DbContextOptions<PersonDbContext> options)
+                    : base(options)
+                {
+                }
+
+                public DbSet<Person> Person { get; set; }
+            }
+             */
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
