@@ -20,7 +20,7 @@ namespace POC1_SQL
             if (builder.Environment.IsDevelopment())
             {
                 builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-                connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+                connection = builder.Configuration.GetConnectionString("Oracle_CONNECTIONSTRING");
             }
             else
             {
