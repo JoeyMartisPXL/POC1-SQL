@@ -1,0 +1,2 @@
+This is the first POC in a series to test database migration and performance for different types of databases. Using 'Microsoft SQL Server Migration Assistant for Oracle', a database can be transfered to Microsoft Azure Database for SQL.
+The goal of this POC is to establish if it is possible to connect to the online database and using the tools provided with the Microsoft Azure Database to measure performance and the ability to process complex queries.
