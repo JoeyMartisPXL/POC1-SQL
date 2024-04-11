@@ -1,4 +1,5 @@
 
+using Data_Access_Layer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace POC1_SQL
@@ -8,6 +9,7 @@ namespace POC1_SQL
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            //ConfigurationManager configuration = builder.Configuration;
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -16,21 +18,28 @@ namespace POC1_SQL
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+
+            builder.Services.AddDbContext<ModelContext>(options =>
+            {
+                // Retrieve the Oracle connection string from configuration
+                string oracleConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=ORCL)));Persist Security Info=True;User Id=IVBUSER;Password=IVB;";
+
+                // Configure the DbContext to use Oracle database
+                options.UseOracle(oracleConnectionString);
+            });
+            
+
             var connection = String.Empty;
             if (builder.Environment.IsDevelopment())
             {
                 builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-                connection = builder.Configuration.GetConnectionString("Oracle_CONNECTIONSTRING");
+                connection = builder.Configuration.GetConnectionString("ORACLE_CONNECTIONSTRING");
             }
             else
             {
                 connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
             }
-
-            //builder.Services.AddDbContext<PersonDbContext>(options =>
-                //options.UseSqlServer(connection));
-
-
 
             var app = builder.Build();
 
@@ -40,64 +49,42 @@ namespace POC1_SQL
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            /*
-            app.MapGet("/Person", (PersonDbContext context) =>
+
+
+            app.MapGet("/Varken", (ModelContext context) =>
             {
-                return context.Person.ToList();
+                return context.Varkens.Take(5).ToList();
             })
-            .WithName("GetPersons")
+            .WithName("GetVarkens")
             .WithOpenApi();
 
-            app.MapPost("/Person", (Person person, PersonDbContext context) =>
+            app.MapGet("/Rund", (ModelContext context) =>
             {
-                context.Add(person);
-                context.SaveChanges();
+                return context.Runds.Take(5).ToList();
             })
-            .WithName("CreatePerson")
+            .WithName("GetRunderen")
+            .WithOpenApi();
+
+
+            app.MapGet("/Metingrund", (ModelContext context) =>
+            {
+                return context.Metingrunds.Take(5).ToList();
+            })
+            .WithName("GetMetingrund")
+            .WithOpenApi();
+
+            app.MapGet("/Metingvarken", (ModelContext context) =>
+            {
+                return context.Metingvarkens.Take(5).ToList();
+            })
+            .WithName("GetMetingvarken")
             .WithOpenApi();
 
 
 
-            public class Person
-            {
-                public int Id { get; set; }
-                public string FirstName { get; set; }
-                public string LastName { get; set; }
-            }
-
-            public class PersonDbContext : DbContext
-            {
-                public PersonDbContext(DbContextOptions<PersonDbContext> options)
-                    : base(options)
-                {
-                }
-
-                public DbSet<Person> Person { get; set; }
-            }
-             */
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-            var summaries = new[]
-            {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
-
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast")
-            .WithOpenApi();
 
             app.Run();
         }
